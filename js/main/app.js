@@ -60,10 +60,8 @@ const interactionManager = new THREE.InteractionManager(
   camera,
   renderer.domElement
 );
-
 //相機控制
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
-
 const cubes = {
   pink: createCube({ color: 0xff00ce, x: -1, y: -1 }),
   purple: createCube({ color: 0x9300fb, x: 1, y: -1 }),
@@ -74,17 +72,21 @@ const cubes = {
 const light = createLight();
 
 for (const [name, object] of Object.entries(cubes)) {
-  object.addEventListener("click", (event) => {
+  object.addEventListener("mousedown", (event) => {
     event.stopPropagation();
     console.log(`${name} cube was clicked`);
     const cube = event.target;
-    const coords = { x: camera.position.x, y: camera.position.y ,z: camera.position.z};
+    const coords = {
+      x: camera.position.x,
+      y: camera.position.y,
+      z: camera.position.z,
+    };
     controls.enabled = false;
     const tween = new TWEEN.Tween(coords)
-      .to({ x: cube.position.x, y: cube.position.y, z: 5})
+      .to({ x: cube.position.x, y: cube.position.y, z: 5 })
       .easing(TWEEN.Easing.Quadratic.Out)
       .onUpdate(() => {
-        controls.target.set(coords.x, coords.y, controls.target.z)
+        controls.target.set(coords.x, coords.y, controls.target.z);
         camera.position.set(coords.x, coords.y, coords.z);
         controls.update();
       })
@@ -92,7 +94,7 @@ for (const [name, object] of Object.entries(cubes)) {
         controls.enabled = true;
         camera.lookAt(cube.position);
         console.log(controls.target);
-        console.log(cube.position)
+        console.log(cube.position);
       })
       .start();
   });
@@ -108,8 +110,6 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
-
-
 
 scene.add(light);
 
