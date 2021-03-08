@@ -61,6 +61,9 @@ const interactionManager = new THREE.InteractionManager(
   renderer.domElement
 );
 
+//相機控制
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
 const cubes = {
   pink: createCube({ color: 0xff00ce, x: -1, y: -1 }),
   purple: createCube({ color: 0x9300fb, x: 1, y: -1 }),
@@ -75,13 +78,22 @@ for (const [name, object] of Object.entries(cubes)) {
     event.stopPropagation();
     console.log(`${name} cube was clicked`);
     const cube = event.target;
-    const coords = { x: camera.position.x, y: camera.position.y };
+    const coords = { x: camera.position.x, y: camera.position.y ,z: camera.position.z};
+    controls.enabled = false;
     const tween = new TWEEN.Tween(coords)
-      .to({ x: cube.position.x, y: cube.position.y })
+      .to({ x: cube.position.x, y: cube.position.y, z: 5})
       .easing(TWEEN.Easing.Quadratic.Out)
-      .onUpdate(() =>
-        camera.position.set(coords.x, coords.y, camera.position.z)
-      )
+      .onUpdate(() => {
+        controls.target.set(coords.x, coords.y, controls.target.z)
+        camera.position.set(coords.x, coords.y, coords.z);
+        controls.update();
+      })
+      .onComplete(() => {
+        controls.enabled = true;
+        camera.lookAt(cube.position);
+        console.log(controls.target);
+        console.log(cube.position)
+      })
       .start();
   });
   interactionManager.add(object);
@@ -97,10 +109,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-//相機控制
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-// controls.target.set(0, 100, 0);
-controls.update();
+
 
 scene.add(light);
 
